@@ -1075,7 +1075,14 @@
     "title": "Chat (stream)",
     "workflowNodeDescription": null
   } ],
-  "clusterElementClusterElementTypes": { },
+  "clusterElementClusterElementTypes": {
+    "jailbreak": [ "model" ],
+    "sanitizeText": [ "sanitizeText" ],
+    "checkForViolations": [ "checkForViolations" ],
+    "topicalAlignment": [ "model" ],
+    "custom": [ "model" ],
+    "nsfw": [ "model" ]
+  },
   "clusterElementTypes": [ {
     "name": "MODEL",
     "key": "model",
@@ -1098,7 +1105,7 @@
     "name": "GUARDRAILS",
     "key": "guardrails",
     "label": "Guardrails",
-    "multipleElements": false,
+    "multipleElements": true,
     "required": false
   }, {
     "name": "TOOLS",
