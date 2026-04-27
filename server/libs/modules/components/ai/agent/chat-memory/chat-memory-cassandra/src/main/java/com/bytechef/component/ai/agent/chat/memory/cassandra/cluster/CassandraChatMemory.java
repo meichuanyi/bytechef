@@ -26,6 +26,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import java.util.Map;
 import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 
@@ -55,6 +56,7 @@ public class CassandraChatMemory {
             .build();
 
         return PromptChatMemoryAdvisor.builder(chatMemory)
+            .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)
             .build();
     }
 }

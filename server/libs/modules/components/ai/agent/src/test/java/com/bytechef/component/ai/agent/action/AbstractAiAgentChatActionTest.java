@@ -41,6 +41,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.model.tool.ToolCallingManager;
 
 /**
  * @author Ivica Cardic
@@ -49,10 +50,13 @@ import org.springframework.ai.chat.model.ChatModel;
 class AbstractAiAgentChatActionTest {
 
     @Mock
+    private AiAgentToolFacade aiAgentToolFacade;
+
+    @Mock
     private ClusterElementDefinitionService clusterElementDefinitionService;
 
     @Mock
-    private AiAgentToolFacade aiAgentToolFacade;
+    private ToolCallingManager toolCallingManager;
 
     @Test
     void testGetChatClientRequestSpecWithNullParameterValues() throws Exception {
@@ -92,7 +96,8 @@ class AbstractAiAgentChatActionTest {
 
         ActionContext actionContext = mock(ActionContext.class);
 
-        TestAiAgentChatAction action = new TestAiAgentChatAction(clusterElementDefinitionService, aiAgentToolFacade);
+        TestAiAgentChatAction action = new TestAiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
 
         try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
             modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
@@ -105,9 +110,11 @@ class AbstractAiAgentChatActionTest {
 
     private static class TestAiAgentChatAction extends AbstractAiAgentChatAction {
 
-        TestAiAgentChatAction(ClusterElementDefinitionService clusterElementDefinitionService,
-            AiAgentToolFacade aiAgentToolFacade) {
-            super(clusterElementDefinitionService, aiAgentToolFacade);
+        TestAiAgentChatAction(
+            AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+            ToolCallingManager toolCallingManager) {
+
+            super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
         }
     }
 }
