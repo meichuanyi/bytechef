@@ -63,39 +63,20 @@ public final class Custom {
     public ClusterElementDefinition<GuardrailCheckFunction> of() {
         return ComponentDsl.<GuardrailCheckFunction>clusterElement("custom")
             .title("Custom")
-            .description("LLM-based guardrail with user-defined classification prompts. One cluster element may "
-                + "hold a single prompt (Name + Prompt) or an array of named prompts (Guardrails).")
+            .description("LLM-based guardrail with one or more user-defined classifier prompts. Each entry in "
+                + "Classifiers runs independently; any flagging entry blocks the request.")
             .type(GuardrailCheckFunction.CHECK_FOR_VIOLATIONS)
             .properties(
-                string(NAME)
-                    .label("Name")
-                    .description("Unique identifier for this guardrail. Ignored when Guardrails below is populated."),
-                string(PROMPT)
-                    .label("Prompt")
-                    .description("Classification instructions for the LLM. Ignored when Guardrails below is "
-                        + "populated."),
-                string(RESPONSE_SCHEMA)
-                    .label("Response Schema")
-                    .description("Optional JSON schema extending the required {flagged: boolean, "
-                        + "confidenceScore: number} response. Extra fields you define (e.g. reason, "
-                        + "category) are surfaced in the violation's diagnostic info. Applies only to the "
-                        + "single-prompt form.")
-                    .controlType(JSON_SCHEMA_BUILDER)
-                    .required(false),
-                number(THRESHOLD)
-                    .label("Threshold")
-                    .description("Minimum confidence score (0.0-1.0) required to flag. Applies to the "
-                        + "single-prompt form; each entry in the multi-entry form has its own threshold.")
-                    .defaultValue(DEFAULT_THRESHOLD),
                 array(GUARDRAILS)
-                    .label("Guardrails")
-                    .description("Multiple named LLM guardrails that all run together. When non-empty, this "
-                        + "takes precedence over the single Name/Prompt pair above.")
+                    .label("Classifiers")
+                    .description("Named LLM classifier prompts that all run together. Add at least one entry.")
                     .items(
                         object()
                             .properties(
                                 string(NAME)
                                     .label("Name")
+                                    .description("Unique identifier for this classifier; appears in the "
+                                        + "violation diagnostic when this entry flags content.")
                                     .required(true),
                                 string(PROMPT)
                                     .label("Prompt")
@@ -103,15 +84,18 @@ public final class Custom {
                                     .required(true),
                                 string(RESPONSE_SCHEMA)
                                     .label("Response Schema")
-                                    .description("Optional JSON schema; extra fields surface in the "
-                                        + "violation's diagnostic info.")
+                                    .description("Optional JSON schema extending the required "
+                                        + "{flagged: boolean, confidenceScore: number} the classifier "
+                                        + "returns. Extra fields you define (e.g. reason, category) are "
+                                        + "attached to the violation diagnostic for downstream tools and "
+                                        + "logs — they do NOT appear in the user's chat response.")
                                     .controlType(JSON_SCHEMA_BUILDER)
                                     .required(false),
                                 number(THRESHOLD)
                                     .label("Threshold")
                                     .description("Minimum confidence score (0.0-1.0) required to flag.")
                                     .defaultValue(DEFAULT_THRESHOLD)))
-                    .required(false),
+                    .required(true),
                 GuardrailProperties.failMode())
             .object(() -> new GuardrailCheckFunction() {
 
@@ -140,21 +124,14 @@ public final class Custom {
         List<Map<String, Object>> entries = (List<Map<String, Object>>) (List<?>) inputParameters.getList(
             GUARDRAILS, Map.class, List.of());
 
-        if (!entries.isEmpty()) {
-            return applyMultiple(chatClient, systemMessage, text, entries);
+        if (entries.isEmpty()) {
+            // Configuration error: at least one classifier entry is required. The advisor's isConfigurationError
+            // branch routes IllegalArgumentException to fail-closed regardless of the user's FAIL_MODE setting.
+            throw new IllegalArgumentException(
+                "Custom guardrail requires at least one entry in 'Classifiers'");
         }
 
-        String guardrailName = inputParameters.getRequiredString(NAME);
-        String userPrompt = inputParameters.getRequiredString(PROMPT);
-        double threshold = inputParameters.getDouble(THRESHOLD, DEFAULT_THRESHOLD);
-        String responseSchema = inputParameters.getString(RESPONSE_SCHEMA);
-
-        if (responseSchema != null && !responseSchema.isBlank()) {
-            return classifyWithSchema(
-                chatClient, guardrailName, userPrompt, threshold, systemMessage, text, responseSchema);
-        }
-
-        return classifyWith(chatClient, guardrailName, userPrompt, threshold, systemMessage, text);
+        return applyMultiple(chatClient, systemMessage, text, entries);
     }
 
     /**

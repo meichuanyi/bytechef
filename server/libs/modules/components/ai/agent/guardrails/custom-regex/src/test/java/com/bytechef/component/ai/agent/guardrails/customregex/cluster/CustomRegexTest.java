@@ -45,7 +45,7 @@ class CustomRegexTest {
 
         Optional<Violation> violation = function.apply(
             "order id ORD-1234 shipped",
-            contextOf(Map.of("name", "ORDER_ID", "regex", "ORD-\\d{4}")));
+            contextOf(Map.of("patterns", List.of(Map.of("name", "ORDER_ID", "regex", "ORD-\\d{4}")))));
 
         assertThat(violation).isPresent();
         assertThat(((Violation.PatternViolation) violation.get()).matchedSubstrings())
@@ -60,7 +60,7 @@ class CustomRegexTest {
 
         Optional<Violation> violation = function.apply(
             "orders ORD-1234 and ORD-5678 shipped",
-            contextOf(Map.of("name", "ORDER_ID", "regex", "ORD-\\d{4}")));
+            contextOf(Map.of("patterns", List.of(Map.of("name", "ORDER_ID", "regex", "ORD-\\d{4}")))));
 
         assertThat(violation).isPresent();
         assertThat(((Violation.PatternViolation) violation.get()).matchedSubstrings())
@@ -77,7 +77,7 @@ class CustomRegexTest {
 
         String sanitized = function.apply(
             "order id ORD-1234 shipped",
-            contextOf(Map.of("name", "ORDER_ID", "regex", "ORD-\\d{4}")));
+            contextOf(Map.of("patterns", List.of(Map.of("name", "ORDER_ID", "regex", "ORD-\\d{4}")))));
 
         assertThat(sanitized).isEqualTo("order id [ORDER_ID] shipped");
     }
@@ -92,7 +92,7 @@ class CustomRegexTest {
 
         String sanitized = function.apply(
             "secret ABC",
-            contextOf(Map.of("name", "$1\\0", "regex", "ABC")));
+            contextOf(Map.of("patterns", List.of(Map.of("name", "$1\\0", "regex", "ABC")))));
 
         assertThat(sanitized).isEqualTo("secret [$1\\0]");
     }
@@ -152,7 +152,7 @@ class CustomRegexTest {
 
         assertThatThrownBy(() -> function.apply(
             "text",
-            contextOf(Map.of("name", "BAD", "regex", "(unclosed"))))
+            contextOf(Map.of("patterns", List.of(Map.of("name", "BAD", "regex", "(unclosed"))))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Invalid regex");
     }
@@ -187,9 +187,10 @@ class CustomRegexTest {
         String input = "a".repeat(count);
 
         assertTimeoutPreemptively(Duration.ofSeconds(4), () -> assertThatThrownBy(
-            () -> function.apply(input, contextOf(Map.of("name", "BOOM", "regex", pattern))))
-                .isInstanceOf(RegexParser.RegexExecutionLimitException.class)
-                .hasMessageContaining("BOOM"));
+            () -> function.apply(input,
+                contextOf(Map.of("patterns", List.of(Map.of("name", "BOOM", "regex", pattern))))))
+                    .isInstanceOf(RegexParser.RegexExecutionLimitException.class)
+                    .hasMessageContaining("BOOM"));
     }
 
     @Test
@@ -237,9 +238,10 @@ class CustomRegexTest {
         String input = "a".repeat(count);
 
         assertTimeoutPreemptively(Duration.ofSeconds(4), () -> assertThatThrownBy(
-            () -> function.apply(input, contextOf(Map.of("name", "BOOM", "regex", pattern))))
-                .isInstanceOf(RegexParser.RegexExecutionLimitException.class)
-                .hasMessageContaining("BOOM"));
+            () -> function.apply(input,
+                contextOf(Map.of("patterns", List.of(Map.of("name", "BOOM", "regex", pattern))))))
+                    .isInstanceOf(RegexParser.RegexExecutionLimitException.class)
+                    .hasMessageContaining("BOOM"));
     }
 
     private static GuardrailContext contextOf(Map<String, ?> input) {

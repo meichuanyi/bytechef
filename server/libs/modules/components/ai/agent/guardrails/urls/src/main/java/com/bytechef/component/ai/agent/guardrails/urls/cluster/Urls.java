@@ -120,12 +120,18 @@ public final class Urls {
     private static Property[] buildSharedProperties(boolean sanitize) {
         return new Property[] {
             array(ALLOWED_URLS)
-                .label("Block All URLs Except")
-                .description("URLs (host names) permitted to appear.")
+                .label("Allowed URLs")
+                .description(
+                    "Allowlist of URLs or host names that are permitted; everything else is " +
+                        (sanitize ? "masked." : "flagged.") +
+                        " Accepts full URLs (e.g. https://api.example.com/v1), host names " +
+                        "(e.g. example.com), or IP / CIDR ranges (e.g. 192.168.0.0/16). Leave empty to " +
+                        (sanitize ? "mask " : "flag ") + "every URL.")
                 .items(string()),
             array(ALLOWED_SCHEMES)
                 .label("Allowed Schemes")
-                .description("Which URL schemes are permitted.")
+                .description("Which URL schemes are permitted; URLs using any other scheme are " +
+                    (sanitize ? "masked." : "flagged."))
                 .items(string())
                 .options(List.of(
                     option("https", "https"),
@@ -144,7 +150,10 @@ public final class Urls {
                 .defaultValue(true),
             bool(ALLOW_SUBDOMAIN)
                 .label("Allow Subdomain")
-                .description("When on, subdomains of allowlisted hosts are also permitted.")
+                .description(
+                    "Extends each entry in 'Allowed URLs' to cover its subdomains. When on, allowing " +
+                        "'example.com' also allows 'api.example.com' and 'staging.api.example.com'. " +
+                        "When off, only the exact host matches.")
                 .defaultValue(true),
             GuardrailProperties.failMode()
         };

@@ -234,4 +234,69 @@ class UrlDetectorTest {
             .as("punycode IDN host must not pass as a match for the Latin-letter allowlist entry")
             .isNotEmpty();
     }
+
+    @Test
+    void testSchemePrefixedAllowlistEntryMatchesHostAndPort() {
+        // Reviewer scenario from PR #4915: allowlist 'http://localhost:5173' must allow
+        // 'http://localhost:5173/automation/projects/...'. Before the fix, the entry was split on the first '/'
+        // (the '/' inside 'http://') and entryHost became 'http:' — every URL was silently rejected.
+        UrlPolicy policy = new UrlPolicy(
+            List.of("http://localhost:5173"), List.of("http", "https"), true, true);
+
+        List<UrlMatch> violations = UrlDetector.detectViolations(
+            "open http://localhost:5173/automation/projects/1052/project-workflows/1064 in browser", policy);
+
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    void testSchemePrefixedAllowlistEntryRejectsDifferentPort() {
+        // Entry 'http://localhost:5173' must not allow URLs on a different port. Without per-port matching, the
+        // user has no way to lock the allowlist to a specific dev server.
+        UrlPolicy policy = new UrlPolicy(
+            List.of("http://localhost:5173"), List.of("http", "https"), true, true);
+
+        List<UrlMatch> violations = UrlDetector.detectViolations(
+            "open http://localhost:9999/foo in browser", policy);
+
+        assertThat(violations).isNotEmpty();
+    }
+
+    @Test
+    void testSchemePrefixedAllowlistEntryWithoutPortMatchesAnyPort() {
+        // Symmetric case: when the allowlist entry omits the port, any port on the host is allowed. Without this,
+        // operators who write 'https://example.com' would inadvertently lock themselves out of port-redirected URLs.
+        UrlPolicy policy = new UrlPolicy(
+            List.of("https://example.com"), List.of("http", "https"), true, true);
+
+        assertThat(UrlDetector.detectViolations(
+            "see https://example.com/p", policy)).isEmpty();
+        assertThat(UrlDetector.detectViolations(
+            "see https://example.com:8443/p", policy)).isEmpty();
+    }
+
+    @Test
+    void testSchemePrefixedAllowlistEntryWithPathMatchesPathPrefix() {
+        // Combine all three: scheme, host, and path-prefix. Pins parity with the bare-host path-prefix branch
+        // (testPathPrefixAllowlistMatchesPrefixOnly) so users get the same semantics whether they write
+        // 'api.example.com/v2/' or 'https://api.example.com/v2/'.
+        UrlPolicy policy = new UrlPolicy(
+            List.of("https://api.example.com/v2/"), List.of("https"), true, true);
+
+        assertThat(UrlDetector.detectViolations(
+            "fetch https://api.example.com/v2/users", policy)).isEmpty();
+        assertThat(UrlDetector.detectViolations(
+            "fetch https://api.example.com/v1/users", policy)).isNotEmpty();
+    }
+
+    @Test
+    void testSchemePrefixedAllowlistEntryHonorsAllowSubdomainFlag() {
+        UrlPolicy allowed = new UrlPolicy(
+            List.of("https://example.com"), List.of("https"), true, true);
+        UrlPolicy disallowed = new UrlPolicy(
+            List.of("https://example.com"), List.of("https"), true, false);
+
+        assertThat(UrlDetector.detectViolations("visit https://api.example.com/p", allowed)).isEmpty();
+        assertThat(UrlDetector.detectViolations("visit https://api.example.com/p", disallowed)).isNotEmpty();
+    }
 }

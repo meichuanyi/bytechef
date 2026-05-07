@@ -57,6 +57,9 @@ public final class TopicalAlignment {
             .properties(
                 bool(CUSTOMIZE_PROMPT)
                     .label("Customize Prompt")
+                    .description(
+                        "If off, uses the built-in topical-alignment classifier prompt. Turn on to override " +
+                            "with your own prompt below.")
                     .defaultValue(false),
                 string(PROMPT)
                     .label("Prompt")

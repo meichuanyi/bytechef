@@ -107,30 +107,25 @@ public final class CustomRegex {
 
     private static Property[] sharedProperties() {
         return new Property[] {
-            string(NAME)
-                .label("Name")
-                .description(
-                    "Used as the placeholder [name] in sanitize mode. Ignored when 'Patterns' below is populated."),
-            string(REGEX)
-                .label("Regex")
-                .description(
-                    "Java regular-expression pattern. Ignored when 'Patterns' below is populated."),
             array(PATTERNS)
                 .label("Patterns")
-                .description("Multiple named regex patterns that all run together. When non-empty, this takes "
-                    + "precedence over the single Name/Regex pair above.")
+                .description("Named regex patterns. Each entry runs against the input; in sanitize mode, "
+                    + "matches are replaced with the entry's [name] placeholder. Add at least one entry.")
                 .items(
                     object()
                         .properties(
                             string(NAME)
                                 .label("Name")
+                                .description(
+                                    "Used as the placeholder [name] in sanitize mode and as the violation "
+                                        + "identifier when this pattern flags content.")
                                 .required(true),
                             string(REGEX)
                                 .label("Regex")
                                 .description("Java regular-expression pattern. Use /pattern/flags literal syntax "
                                     + "for JS-style regex flags (e.g. /ssn-\\d{4}/i).")
                                 .required(true)))
-                .required(false),
+                .required(true),
             GuardrailProperties.failMode()
         };
     }
@@ -143,33 +138,26 @@ public final class CustomRegex {
         List<Map<String, String>> entries = (List<Map<String, String>>) (List<?>) inputParameters.getList(
             PATTERNS, Map.class, List.of());
 
-        if (!entries.isEmpty()) {
-            List<NamedRegex> list = new ArrayList<>(entries.size());
+        if (entries.isEmpty()) {
+            throw new IllegalArgumentException(
+                "Custom Regex requires at least one entry in 'Patterns'");
+        }
 
-            for (Map<String, String> entry : entries) {
-                String entryName = entry.get(NAME);
-                String entryRegex = entry.get(REGEX);
+        List<NamedRegex> list = new ArrayList<>(entries.size());
 
-                if (entryName == null || entryName.isBlank() || entryRegex == null || entryRegex.isBlank()) {
-                    throw new IllegalArgumentException(
-                        "Each custom-regex pattern requires non-empty 'name' and 'regex' fields");
-                }
+        for (Map<String, String> entry : entries) {
+            String entryName = entry.get(NAME);
+            String entryRegex = entry.get(REGEX);
 
-                list.add(new NamedRegex(entryName, compileOrThrow(entryRegex)));
+            if (entryName == null || entryName.isBlank() || entryRegex == null || entryRegex.isBlank()) {
+                throw new IllegalArgumentException(
+                    "Each custom-regex pattern requires non-empty 'name' and 'regex' fields");
             }
 
-            return list;
+            list.add(new NamedRegex(entryName, compileOrThrow(entryRegex)));
         }
 
-        String singleName = inputParameters.getString(NAME);
-        String singleRegex = inputParameters.getString(REGEX);
-
-        if (singleName == null || singleName.isBlank() || singleRegex == null || singleRegex.isBlank()) {
-            throw new IllegalArgumentException(
-                "Custom Regex requires either a 'patterns' array or both 'name' and 'regex'");
-        }
-
-        return List.of(new NamedRegex(singleName, compileOrThrow(singleRegex)));
+        return list;
     }
 
     private static Pattern compileOrThrow(String regex) {

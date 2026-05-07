@@ -98,15 +98,10 @@ public final class GuardrailsConstants {
     // Guardrail-level: CustomRegex / Custom
     public static final String NAME = "name";
     public static final String REGEX = "regex";
-    public static final String CUSTOM_REGEXES = "customRegexes";
     public static final String CUSTOMIZE_PROMPT = "customizePrompt";
     public static final String PROMPT = "prompt";
     public static final String RESPONSE_SCHEMA = "responseSchema";
     public static final String THRESHOLD = "threshold";
-
-    // Runtime JSON contract (LLM output schema)
-    public static final String CONFIDENCE_SCORE = "confidenceScore";
-    public static final String FLAGGED = "flagged";
 
     // Per-check fail mode
     public static final String FAIL_MODE = "failMode";

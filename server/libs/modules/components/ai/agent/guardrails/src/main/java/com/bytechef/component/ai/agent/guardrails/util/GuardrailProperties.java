@@ -47,11 +47,15 @@ public final class GuardrailProperties {
         return string(FAIL_MODE)
             .label("Fail Mode")
             .description(
-                "What to do when this check cannot run. FAIL_CLOSED blocks the request (safer); " +
-                    "FAIL_OPEN records the failure and lets the request through (availability-first).")
+                "Decides what happens when this check itself cannot run (LLM outage, missing model child, " +
+                    "invalid regex, configuration error). It does NOT affect successful checks: a check that " +
+                    "runs and finds a violation always blocks the request regardless of this setting. " +
+                    "Fail closed = block the request when the check cannot run (security-first, default). " +
+                    "Fail open = let the request through and record the failure to telemetry " +
+                    "(availability-first).")
             .options(
-                option("Fail closed (block)", FAIL_CLOSED),
-                option("Fail open (allow)", FAIL_OPEN))
+                option("Fail closed (block on check failure)", FAIL_CLOSED),
+                option("Fail open (allow on check failure)", FAIL_OPEN))
             .defaultValue(FAIL_CLOSED)
             .required(false);
     }

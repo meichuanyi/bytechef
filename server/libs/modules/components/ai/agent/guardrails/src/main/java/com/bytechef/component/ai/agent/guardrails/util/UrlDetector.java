@@ -196,7 +196,7 @@ public final class UrlDetector {
                 continue;
             }
 
-            if (!urlAllowed(host, path, policy)) {
+            if (!urlAllowed(host, uri.getPort(), path, policy)) {
                 violations.add(new UrlMatch(rawUrl, start, end, "HOST_NOT_ALLOWED"));
             }
         }
@@ -254,7 +254,7 @@ public final class UrlDetector {
             });
 
             // Bare IPs have no scheme. Allow only if explicitly allowlisted (CIDR or exact host).
-            if (urlAllowed(rawUrl, "", policy)) {
+            if (urlAllowed(rawUrl, -1, "", policy)) {
                 continue;
             }
 
@@ -317,7 +317,7 @@ public final class UrlDetector {
                 path = rawUrl.substring(slashIndex);
             }
 
-            if (urlAllowed(host, path, policy)) {
+            if (urlAllowed(host, -1, path, policy)) {
                 continue;
             }
 
@@ -335,7 +335,7 @@ public final class UrlDetector {
         return false;
     }
 
-    private static boolean urlAllowed(String host, String path, UrlPolicy policy) {
+    private static boolean urlAllowed(String host, int port, String path, UrlPolicy policy) {
         List<String> allowed = policy.allowedUrls();
 
         if (allowed == null || allowed.isEmpty()) {
@@ -356,6 +356,17 @@ public final class UrlDetector {
                 .matches()) {
 
                 if (ipv4InCidr(host, normalized)) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            // Full URL form: "scheme://host[:port][/path]". Parse via URI so the scheme is not confused with the
+            // first '/' path-prefix split — without this branch, an entry like 'http://localhost:5173' was split on
+            // the '/' inside 'http://', producing entryHost="http:" and silently rejecting every URL.
+            if (normalized.contains("://")) {
+                if (matchesSchemeEntry(normalizedHost, port, path, normalized, policy.allowSubdomain())) {
                     return true;
                 }
 
@@ -387,6 +398,56 @@ public final class UrlDetector {
         }
 
         return false;
+    }
+
+    /**
+     * Match an allowlist entry that includes a scheme (e.g. {@code http://localhost:5173},
+     * {@code https://api.example.com/v1/}). Compares host (with optional subdomain), port (if specified on the entry),
+     * and path-prefix. Port {@code -1} on the entry means "any port"; if the entry specified a port the input must use
+     * that exact port.
+     */
+    private static boolean matchesSchemeEntry(
+        String normalizedHost, int inputPort, String inputPath, String entry, boolean allowSubdomain) {
+
+        URI entryUri;
+
+        try {
+            entryUri = new URI(entry);
+        } catch (URISyntaxException e) {
+            return false;
+        }
+
+        String entryHostRaw = entryUri.getHost();
+
+        if (entryHostRaw == null || entryHostRaw.isEmpty()) {
+            return false;
+        }
+
+        String entryHost = stripWwwPrefix(entryHostRaw.toLowerCase(Locale.ROOT));
+
+        boolean hostMatches = normalizedHost.equals(entryHost) ||
+            (allowSubdomain && normalizedHost.endsWith("." + entryHost));
+
+        if (!hostMatches) {
+            return false;
+        }
+
+        int entryPort = entryUri.getPort();
+
+        // Entry-specified port must match exactly. -1 on the entry means "any port", matching the bare-host branch.
+        if (entryPort != -1 && entryPort != inputPort) {
+            return false;
+        }
+
+        String entryPath = entryUri.getRawPath() == null ? "" : entryUri.getRawPath();
+
+        if (entryPath.isEmpty() || entryPath.equals("/")) {
+            return true;
+        }
+
+        String entryPathWithSlash = entryPath.endsWith("/") ? entryPath : entryPath + "/";
+
+        return (inputPath + "/").startsWith(entryPathWithSlash);
     }
 
     private static String stripWwwPrefix(String host) {

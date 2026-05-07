@@ -16,7 +16,6 @@
 
 package com.bytechef.component.ai.agent.guardrails.pii.cluster;
 
-import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.CUSTOM_REGEXES;
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.ENTITIES;
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.TYPE;
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.TYPE_ALL;
@@ -29,7 +28,6 @@ import com.bytechef.component.ai.agent.guardrails.util.GuardrailProperties;
 import com.bytechef.component.ai.agent.guardrails.util.PiiDetector;
 import com.bytechef.component.ai.agent.guardrails.util.PiiDetector.PiiMatch;
 import com.bytechef.component.ai.agent.guardrails.util.PiiDetector.PiiPattern;
-import com.bytechef.component.ai.agent.guardrails.util.RegexParser;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -48,7 +46,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Pattern;
 
 /**
  * Rule-based personally-identifiable-information detection: emails, phone numbers, credit cards, IPs, IBANs, SSNs and
@@ -120,7 +117,9 @@ public final class Pii {
         return new Property[] {
             string(TYPE)
                 .label("Type")
-                .description("Scan for all available PII types or a user-selected subset.")
+                .description("Scan for all available PII types or a user-selected subset. Add the standalone "
+                    + "Custom Regex action to the agent if you also need to detect or sanitize "
+                    + "project-specific patterns alongside PII.")
                 .options(
                     option("All", TYPE_ALL),
                     option("Selected", TYPE_SELECTED))
@@ -132,13 +131,6 @@ public final class Pii {
                 .items(string())
                 .options(PiiDetector.getPiiDetectionOptions())
                 .displayCondition(TYPE + " == '" + TYPE_SELECTED + "'")
-                .required(false),
-            array(CUSTOM_REGEXES)
-                .label("Custom Regexes")
-                .description("Additional regex patterns to detect (alongside the built-in PII entities). "
-                    + "Use the /pattern/flags literal form to specify case-insensitivity, e.g. "
-                    + "/MY-CUSTOMER-\\d{4}/i.")
-                .items(string())
                 .required(false),
             GuardrailProperties.failMode()
         };
@@ -154,32 +146,6 @@ public final class Pii {
         return PiiDetector.DEFAULT_PII_PATTERNS;
     }
 
-    private static List<Pattern> customRegexesOf(Parameters params) {
-        List<String> rawCustomRegexes = params.getList(CUSTOM_REGEXES, String.class, List.of());
-        List<Pattern> compiled = new ArrayList<>(rawCustomRegexes.size());
-
-        for (String raw : rawCustomRegexes) {
-            try {
-                compiled.add(RegexParser.compile(raw));
-            } catch (IllegalArgumentException cause) {
-                // IllegalArgumentException covers both RegexParser's explicit bad-flag rejections and the
-                // PatternSyntaxException it re-throws (PatternSyntaxException extends IllegalArgumentException). Use
-                // log-once semantics (via RegexParser.logCompileErrorOnce) so a single misconfigured workflow does not
-                // spam ERROR logs on every request — the per-request compilation loop would otherwise emit the same
-                // ERROR until someone fixes the config. Surface the IllegalArgumentException so the advisor's
-                // recordFailure treats it as a configuration error (always fail-closed) regardless of the user's
-                // FAIL_MODE setting — a broken custom regex is an operator bug, not a transient outage, and FAIL_OPEN
-                // would silently leave the guardrail inert.
-                RegexParser.logCompileErrorOnce("pii", raw, cause);
-
-                throw new IllegalArgumentException(
-                    "Invalid PII custom regex '" + raw + "': " + cause.getMessage(), cause);
-            }
-        }
-
-        return List.copyOf(compiled);
-    }
-
     private static CachedConfig resolveConfig(GuardrailContext context, AtomicReference<CachedConfig> cache) {
         CachedConfig cached = cache.get();
 
@@ -188,8 +154,7 @@ public final class Pii {
         }
 
         Parameters inputParameters = context.inputParameters();
-        CachedConfig fresh = new CachedConfig(
-            context, resolvePatterns(inputParameters), customRegexesOf(inputParameters));
+        CachedConfig fresh = new CachedConfig(context, resolvePatterns(inputParameters));
 
         cache.set(fresh);
 
@@ -197,7 +162,7 @@ public final class Pii {
     }
 
     private static Optional<Violation> applyCheck(String text, CachedConfig config) {
-        List<PiiMatch> matches = PiiDetector.detect(text, config.patterns(), config.customRegexes());
+        List<PiiMatch> matches = PiiDetector.detect(text, config.patterns(), List.of());
 
         if (matches.isEmpty()) {
             return Optional.empty();
@@ -216,7 +181,7 @@ public final class Pii {
     }
 
     private static String maskText(String text, CachedConfig config) {
-        List<PiiMatch> matches = PiiDetector.detect(text, config.patterns(), config.customRegexes());
+        List<PiiMatch> matches = PiiDetector.detect(text, config.patterns(), List.of());
 
         return PiiDetector.mask(text, matches);
     }
@@ -227,7 +192,7 @@ public final class Pii {
      * don't leave partial fragments.
      */
     private static Map<String, List<String>> collectMaskEntities(String text, CachedConfig config) {
-        List<PiiMatch> matches = PiiDetector.detect(text, config.patterns(), config.customRegexes());
+        List<PiiMatch> matches = PiiDetector.detect(text, config.patterns(), List.of());
 
         if (matches.isEmpty()) {
             return Map.of();
@@ -248,10 +213,9 @@ public final class Pii {
     }
 
     /**
-     * Compiled per-request configuration shared between {@code apply}/{@code mask} and {@code preflightMaskEntities} so
-     * user custom regexes compile once per advisor pass instead of once per method invocation. The {@code context}
-     * field is the reference-equality cache key.
+     * Resolved per-request configuration cached against the {@link GuardrailContext} reference so the patterns are
+     * computed once per advisor pass instead of on every method invocation.
      */
-    private record CachedConfig(GuardrailContext context, List<PiiPattern> patterns, List<Pattern> customRegexes) {
+    private record CachedConfig(GuardrailContext context, List<PiiPattern> patterns) {
     }
 }

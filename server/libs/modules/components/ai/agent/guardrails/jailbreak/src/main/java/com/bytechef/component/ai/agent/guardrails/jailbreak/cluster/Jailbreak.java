@@ -58,9 +58,13 @@ public final class Jailbreak {
             .properties(
                 bool(CUSTOMIZE_PROMPT)
                     .label("Customize Prompt")
+                    .description(
+                        "If off, uses the built-in jailbreak / prompt-injection classifier prompt. Turn on " +
+                            "to override with your own prompt below.")
                     .defaultValue(false),
                 string(PROMPT)
                     .label("Prompt")
+                    .description("Classification instructions for the LLM.")
                     .defaultValue(DEFAULT_JAILBREAK_PROMPT)
                     .displayCondition(CUSTOMIZE_PROMPT + " == true"),
                 number(THRESHOLD)

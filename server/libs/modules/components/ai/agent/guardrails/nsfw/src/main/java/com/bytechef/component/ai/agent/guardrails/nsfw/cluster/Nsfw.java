@@ -54,9 +54,13 @@ public final class Nsfw {
             .properties(
                 bool(CUSTOMIZE_PROMPT)
                     .label("Customize Prompt")
+                    .description(
+                        "If off, uses the built-in NSFW classifier prompt. Turn on to override with your own " +
+                            "prompt below.")
                     .defaultValue(false),
                 string(PROMPT)
                     .label("Prompt")
+                    .description("Classification instructions for the LLM.")
                     .defaultValue(DEFAULT_NSFW_PROMPT)
                     .displayCondition(CUSTOMIZE_PROMPT + " == true"),
                 number(THRESHOLD)

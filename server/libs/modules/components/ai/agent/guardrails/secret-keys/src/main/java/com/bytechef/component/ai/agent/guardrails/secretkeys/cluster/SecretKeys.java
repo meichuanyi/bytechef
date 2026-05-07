@@ -16,7 +16,6 @@
 
 package com.bytechef.component.ai.agent.guardrails.secretkeys.cluster;
 
-import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.CUSTOM_REGEXES;
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.PERMISSIVENESS;
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.PERMISSIVENESS_BALANCED;
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.PERMISSIVENESS_PERMISSIVE;
@@ -26,7 +25,6 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.agent.guardrails.util.GuardrailProperties;
-import com.bytechef.component.ai.agent.guardrails.util.RegexParser;
 import com.bytechef.component.ai.agent.guardrails.util.SecretKeyDetector;
 import com.bytechef.component.ai.agent.guardrails.util.SecretKeyDetector.Permissiveness;
 import com.bytechef.component.ai.agent.guardrails.util.SecretKeyDetector.SecretMatch;
@@ -49,7 +47,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Pattern;
 
 /**
  * @author Ivica Cardic
@@ -67,8 +64,9 @@ public final class SecretKeys {
             .properties(sharedProperties())
             .object(() -> new PreflightCheckFunction() {
 
-                // Reference-equality cache of the compiled config per GuardrailContext. Parallel to Pii.ofCheck:
-                // user custom regexes compile once per advisor pass instead of once per method invocation.
+                // Reference-equality cache of the resolved config per GuardrailContext. Mirrors Pii.ofCheck so
+                // permissiveness and the file-extension allowlist are resolved once per advisor pass, not on
+                // every method invocation.
                 private final AtomicReference<CachedConfig> configCache = new AtomicReference<>();
 
                 @Override
@@ -115,24 +113,24 @@ public final class SecretKeys {
         return new Property[] {
             string(PERMISSIVENESS)
                 .label("Permissiveness")
-                .description("STRICT = most aggressive; BALANCED = named providers + entropy; "
-                    + "PERMISSIVE = named providers only.")
+                .description("How aggressively to scan for secrets. "
+                    + "Strict catches the most — well-known provider tokens, random-looking strings, "
+                    + "and generic 'apikey=...' / 'secret=...' assignments — and produces more false "
+                    + "positives. "
+                    + "Balanced (default) catches well-known provider tokens plus random-looking strings. "
+                    + "Permissive only catches well-known provider tokens "
+                    + "(AWS, GitHub, Stripe, OpenAI, Slack, Google, JWT).")
                 .options(
-                    option("Strict", PERMISSIVENESS_STRICT),
-                    option("Balanced", PERMISSIVENESS_BALANCED),
-                    option("Permissive", PERMISSIVENESS_PERMISSIVE))
+                    option("Strict (most coverage, more false positives)", PERMISSIVENESS_STRICT),
+                    option("Balanced (default)", PERMISSIVENESS_BALANCED),
+                    option("Permissive (named providers only)", PERMISSIVENESS_PERMISSIVE))
                 .defaultValue(PERMISSIVENESS_BALANCED),
-            array(CUSTOM_REGEXES)
-                .label("Custom Regexes")
-                .description("Additional regex patterns to detect (alongside the built-in providers and entropy "
-                    + "scanner). Use the /pattern/flags literal form to specify case-insensitivity, e.g. "
-                    + "/myapikey-[a-z0-9]{32}/i.")
-                .items(string())
-                .required(false),
             array(ALLOWED_FILE_EXTENSIONS)
                 .label("Allowed File Extensions")
                 .description("Skip secret detection inside markdown fenced code blocks tagged with these "
-                    + "extensions (e.g. py, js, ts). Useful when the input legitimately contains code samples.")
+                    + "extensions (e.g. py, js, ts). Useful when the input legitimately contains code "
+                    + "samples. Add the standalone Custom Regex action to the agent if you also need "
+                    + "to detect or sanitize project-specific patterns alongside Secret Keys.")
                 .items(string())
                 .required(false),
             GuardrailProperties.failMode()
@@ -152,30 +150,6 @@ public final class SecretKeys {
         }
     }
 
-    private static List<Pattern> customRegexesOf(Parameters params) {
-        List<String> rawCustomRegexes = params.getList(CUSTOM_REGEXES, String.class, List.of());
-        List<Pattern> compiled = new ArrayList<>(rawCustomRegexes.size());
-
-        for (String raw : rawCustomRegexes) {
-            try {
-                compiled.add(RegexParser.compile(raw));
-            } catch (IllegalArgumentException cause) {
-                // Log-once-per-TTL to correlate "every request blocked" to a specific bad regex without spamming the
-                // ERROR channel on every request. See Pii.customRegexesOf for parity.
-                RegexParser.logCompileErrorOnce("secret-keys", raw, cause);
-
-                // IllegalArgumentException covers both RegexParser's explicit bad-flag rejections and the
-                // PatternSyntaxException it re-throws (PatternSyntaxException extends IllegalArgumentException).
-                // Surfaced as IllegalArgumentException so the advisor's recordFailure treats it as a configuration
-                // error (always fail-closed) regardless of the user's FAIL_MODE setting.
-                throw new IllegalArgumentException(
-                    "Invalid Secret Keys custom regex '" + raw + "': " + cause.getMessage(), cause);
-            }
-        }
-
-        return List.copyOf(compiled);
-    }
-
     private static CachedConfig resolveConfig(GuardrailContext context, AtomicReference<CachedConfig> cache) {
         CachedConfig cached = cache.get();
 
@@ -185,7 +159,7 @@ public final class SecretKeys {
 
         Parameters inputParameters = context.inputParameters();
         CachedConfig fresh = new CachedConfig(
-            context, levelOf(inputParameters), customRegexesOf(inputParameters),
+            context, levelOf(inputParameters),
             List.copyOf(inputParameters.getList(ALLOWED_FILE_EXTENSIONS, String.class, List.of())));
 
         cache.set(fresh);
@@ -195,7 +169,7 @@ public final class SecretKeys {
 
     private static Optional<Violation> applyCheck(String text, CachedConfig config) {
         List<SecretMatch> matches = SecretKeyDetector.detect(
-            text, config.permissiveness(), config.customRegexes(), config.allowedFileExtensions());
+            text, config.permissiveness(), List.of(), config.allowedFileExtensions());
 
         if (matches.isEmpty()) {
             return Optional.empty();
@@ -217,14 +191,14 @@ public final class SecretKeys {
 
     private static String maskText(String text, CachedConfig config) {
         List<SecretMatch> matches = SecretKeyDetector.detect(
-            text, config.permissiveness(), config.customRegexes(), config.allowedFileExtensions());
+            text, config.permissiveness(), List.of(), config.allowedFileExtensions());
 
         return SecretKeyDetector.mask(text, matches);
     }
 
     private static Map<String, List<String>> collectMaskEntities(String text, CachedConfig config) {
         List<SecretMatch> matches = SecretKeyDetector.detect(
-            text, config.permissiveness(), config.customRegexes(), config.allowedFileExtensions());
+            text, config.permissiveness(), List.of(), config.allowedFileExtensions());
 
         if (matches.isEmpty()) {
             return Map.of();
@@ -245,11 +219,10 @@ public final class SecretKeys {
     }
 
     /**
-     * Compiled per-request configuration shared between {@code apply}/{@code mask} and {@code preflightMaskEntities} so
-     * user custom regexes compile once per advisor pass instead of once per method invocation.
+     * Resolved per-request configuration cached against the {@link GuardrailContext} reference so the permissiveness
+     * and file-extension allowlist are resolved once per advisor pass instead of on every method invocation.
      */
     private record CachedConfig(
-        GuardrailContext context, Permissiveness permissiveness, List<Pattern> customRegexes,
-        List<String> allowedFileExtensions) {
+        GuardrailContext context, Permissiveness permissiveness, List<String> allowedFileExtensions) {
     }
 }

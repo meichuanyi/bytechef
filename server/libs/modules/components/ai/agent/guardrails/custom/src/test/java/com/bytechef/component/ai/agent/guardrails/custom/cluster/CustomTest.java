@@ -113,10 +113,11 @@ class CustomTest {
             .getElement();
 
         Parameters inputParameters = ParametersFactory.create(Map.of(
-            NAME, "spamCheck",
-            PROMPT, "Is this spam?",
-            RESPONSE_SCHEMA, "{}",
-            THRESHOLD, 0.7));
+            "guardrails", java.util.List.of(Map.of(
+                NAME, "spamCheck",
+                PROMPT, "Is this spam?",
+                RESPONSE_SCHEMA, "{}",
+                THRESHOLD, 0.7))));
 
         GuardrailContext context = new GuardrailContext(
             inputParameters, ParametersFactory.create(Map.of()), ParametersFactory.create(Map.of()),
@@ -185,8 +186,9 @@ class CustomTest {
     }
 
     @Test
-    void testEmptyGuardrailsListFallsBackToTopLevelNameAndPrompt() throws Exception {
-        // When `guardrails: []` the top-level NAME/PROMPT pair should be used.
+    void testEmptyGuardrailsListThrowsConfigurationError() {
+        // The Classifiers list is required; an empty array is a configuration error that the advisor's
+        // isConfigurationError branch routes to fail-closed regardless of FAIL_MODE.
         Custom custom = new Custom();
 
         @SuppressWarnings("unchecked")
@@ -196,26 +198,21 @@ class CustomTest {
         ChatClient chatClient = mockClient(new LlmClassifier.Response(0.9, true));
 
         GuardrailContext context = new GuardrailContext(
-            ParametersFactory.create(Map.of(
-                "guardrails", java.util.List.of(),
-                NAME, "top-level-guardrail",
-                PROMPT, "Detect top-level")),
+            ParametersFactory.create(Map.of("guardrails", java.util.List.of())),
             ParametersFactory.create(Map.of()),
             ParametersFactory.create(Map.of()),
             ParametersFactory.create(Map.of()),
             Map.of(),
             chatClient);
 
-        Optional<Violation> violation = function.apply("sensitive", context);
-
-        assertThat(violation).isPresent();
-        assertThat(violation.get()
-            .guardrail()).isEqualTo("top-level-guardrail");
+        assertThatThrownBy(() -> function.apply("sensitive", context))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("at least one entry");
     }
 
     @Test
-    void testSingleEntryGuardrailsListTakesPrecedenceOverTopLevelNameAndPrompt() throws Exception {
-        // A non-empty `guardrails` array (even with one entry) must override the top-level NAME/PROMPT.
+    void testSingleEntryGuardrailsListExecutesEntry() throws Exception {
+        // A guardrails list with one entry runs that entry exactly the same way as a multi-entry list.
         Custom custom = new Custom();
 
         @SuppressWarnings("unchecked")
@@ -227,9 +224,7 @@ class CustomTest {
         GuardrailContext context = new GuardrailContext(
             ParametersFactory.create(Map.of(
                 "guardrails", java.util.List.of(
-                    Map.of(NAME, "array-entry", PROMPT, "Prompt from array")),
-                NAME, "IGNORED-top-level",
-                PROMPT, "IGNORED-top-level-prompt")),
+                    Map.of(NAME, "array-entry", PROMPT, "Prompt from array")))),
             ParametersFactory.create(Map.of()),
             ParametersFactory.create(Map.of()),
             ParametersFactory.create(Map.of()),
@@ -241,7 +236,6 @@ class CustomTest {
         assertThat(violation).isPresent();
         assertThat(violation.get()
             .guardrail())
-                .as("non-empty guardrails list must win over top-level NAME/PROMPT")
                 .isEqualTo("array-entry");
     }
 
@@ -326,7 +320,8 @@ class CustomTest {
             .getElement();
 
         GuardrailContext context = new GuardrailContext(
-            ParametersFactory.create(Map.of(NAME, "my-custom", PROMPT, "Detect X")),
+            ParametersFactory.create(Map.of(
+                "guardrails", java.util.List.of(Map.of(NAME, "my-custom", PROMPT, "Detect X")))),
             ParametersFactory.create(Map.of()),
             ParametersFactory.create(Map.of()),
             ParametersFactory.create(Map.of()),
