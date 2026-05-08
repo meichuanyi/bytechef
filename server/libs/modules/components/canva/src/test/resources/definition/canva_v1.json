@@ -678,9 +678,9 @@
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "defaultValue": null,
-      "description": "The type of design.",
+      "description": null,
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -691,139 +691,97 @@
       "metadata": { },
       "minLength": null,
       "name": "type",
-      "options": null,
+      "options": [ {
+        "description": null,
+        "label": "Preset",
+        "value": "preset"
+      }, {
+        "description": null,
+        "label": "Custom",
+        "value": "custom"
+      } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
-      "placeholder": "type_and_asset",
+      "placeholder": null,
       "regex": null,
       "required": true,
       "type": "STRING"
     }, {
-      "additionalProperties": null,
       "advancedOption": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "SELECT",
       "defaultValue": null,
-      "description": "The desired design type.",
-      "displayCondition": null,
+      "description": "The name of the design type.",
+      "displayCondition": "type == 'preset'",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": null,
+      "label": "Name",
+      "languageId": null,
+      "maxLength": null,
       "metadata": { },
-      "multipleValues": null,
-      "name": "design_type",
+      "minLength": null,
+      "name": "name",
+      "options": [ {
+        "description": null,
+        "label": "Doc",
+        "value": "doc"
+      }, {
+        "description": null,
+        "label": "Email",
+        "value": "email"
+      }, {
+        "description": null,
+        "label": "Presentation",
+        "value": "presentation"
+      }, {
+        "description": null,
+        "label": "Whiteboard",
+        "value": "whiteboard"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "The width of the design, in pixels.",
+      "displayCondition": "type == 'custom'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Width",
+      "maxValue": 8000,
+      "metadata": { },
+      "minValue": 40,
+      "name": "width",
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "properties": [ {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": null,
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Type",
-        "languageId": null,
-        "maxLength": null,
-        "metadata": { },
-        "minLength": null,
-        "name": "type",
-        "options": [ {
-          "description": null,
-          "label": "Preset",
-          "value": "preset"
-        }, {
-          "description": null,
-          "label": "Custom",
-          "value": "custom"
-        } ],
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": true,
-        "type": "STRING"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "The name of the design type.",
-        "displayCondition": "design_type.type == 'preset'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Name",
-        "languageId": null,
-        "maxLength": null,
-        "metadata": { },
-        "minLength": null,
-        "name": "name",
-        "options": [ {
-          "description": null,
-          "label": "Doc",
-          "value": "doc"
-        }, {
-          "description": null,
-          "label": "Email",
-          "value": "email"
-        }, {
-          "description": null,
-          "label": "Presentation",
-          "value": "presentation"
-        }, {
-          "description": null,
-          "label": "Whiteboard",
-          "value": "whiteboard"
-        } ],
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": true,
-        "type": "STRING"
-      }, {
-        "advancedOption": null,
-        "controlType": "INTEGER",
-        "defaultValue": null,
-        "description": "The width of the design, in pixels.",
-        "displayCondition": "design_type.type == 'custom'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Width",
-        "maxValue": 8000,
-        "metadata": { },
-        "minValue": 40,
-        "name": "width",
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "required": true,
-        "type": "INTEGER"
-      }, {
-        "advancedOption": null,
-        "controlType": "INTEGER",
-        "defaultValue": null,
-        "description": "The height of the design, in pixels.",
-        "displayCondition": "design_type.type == 'custom'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Height",
-        "maxValue": 8000,
-        "metadata": { },
-        "minValue": 40,
-        "name": "height",
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "required": true,
-        "type": "INTEGER"
-      } ],
-      "required": false,
-      "type": "OBJECT"
+      "required": true,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "The height of the design, in pixels.",
+      "displayCondition": "type == 'custom'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Height",
+      "maxValue": 8000,
+      "metadata": { },
+      "minValue": 40,
+      "name": "height",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "INTEGER"
     }, {
       "advancedOption": null,
       "controlType": "TEXT",
@@ -1134,370 +1092,350 @@
       "required": true,
       "type": "STRING"
     }, {
-      "additionalProperties": null,
       "advancedOption": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Details about the desired export format.",
+      "description": null,
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Format",
+      "label": "Type",
+      "languageId": null,
+      "maxLength": null,
       "metadata": { },
-      "multipleValues": null,
-      "name": "format",
+      "minLength": null,
+      "name": "type",
+      "options": [ {
+        "description": "Export the design as a PDF.",
+        "label": "pdf",
+        "value": "pdf"
+      }, {
+        "description": "Export the design as a JPEG.",
+        "label": "jpg",
+        "value": "jpg"
+      }, {
+        "description": "Export the design as a PNG.",
+        "label": "png",
+        "value": "png"
+      }, {
+        "description": "Export the design as a PPTX.",
+        "label": "pptx",
+        "value": "pptx"
+      }, {
+        "description": "Export the design as a GIF.",
+        "label": "gif",
+        "value": "gif"
+      }, {
+        "description": "Export the design as an MP4.",
+        "label": "mp4",
+        "value": "mp4"
+      }, {
+        "description": "Export the email design as an HTML bundle.",
+        "label": "html_bundle",
+        "value": "html_bundle"
+      }, {
+        "description": "Export the email design as a standalone HTML file with hosted assets.",
+        "label": "html_standalone",
+        "value": "html_standalone"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "The quality of the exported JPEG that determines how compressed the exported file should be.",
+      "displayCondition": "type == 'jpg'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Quality",
+      "maxValue": 100,
+      "metadata": { },
+      "minValue": 1,
+      "name": "quality",
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "properties": [ {
+      "required": true,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The orientation and resolution of the exported video.",
+      "displayCondition": "type == 'mp4'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Video quality",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "video_quality",
+      "options": [ {
+        "description": null,
+        "label": "horizontal_480p",
+        "value": "horizontal_480p"
+      }, {
+        "description": null,
+        "label": "horizontal_720p",
+        "value": "horizontal_720p"
+      }, {
+        "description": null,
+        "label": "horizontal_1080p",
+        "value": "horizontal_1080p"
+      }, {
+        "description": null,
+        "label": "horizontal_4k",
+        "value": "horizontal_4k"
+      }, {
+        "description": null,
+        "label": "vertical_480p",
+        "value": "vertical_480p"
+      }, {
+        "description": null,
+        "label": "vertical_720p",
+        "value": "verformat.put(WIDTH, inputParameters.getInteger(WIDTH));tical_720p"
+      }, {
+        "description": null,
+        "label": "vertical_1080p",
+        "value": "vertical_1080p"
+      }, {
+        "description": null,
+        "label": "vertical_4k",
+        "value": "vertical_4k"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Specifies the export quality of the design.",
+      "displayCondition": "format.type != 'pptx' || format.type != 'html_bundle' || format.type != 'html_standalone'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Export quality",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "export_quality",
+      "options": [ {
+        "description": null,
+        "label": "Regular",
+        "value": "regular"
+      }, {
+        "description": null,
+        "label": "Pro",
+        "value": "pro"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "Specify the width in pixels of the exported image.",
+      "displayCondition": "type == 'jpg' || type == 'png' || type == 'gif' ",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Width",
+      "maxValue": 25000,
+      "metadata": { },
+      "minValue": 40,
+      "name": "width",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "Specify the height in pixels of the exported image.",
+      "displayCondition": "type == 'jpg' || type == 'png' || type == 'gif' ",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Height",
+      "maxValue": 25000,
+      "metadata": { },
+      "minValue": 40,
+      "name": "height",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The paper size of the export PDF file.",
+      "displayCondition": "type == 'pdf'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Size",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "size",
+      "options": [ {
+        "description": null,
+        "label": "a4",
+        "value": "a4"
+      }, {
+        "description": null,
+        "label": "a3",
+        "value": "a3"
+      }, {
+        "description": null,
+        "label": "letter",
+        "value": "letter"
+      }, {
+        "description": null,
+        "label": "legal",
+        "value": "legal"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "If set to true (default), the PNG is exported without compression.",
+      "displayCondition": "type == 'png'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Lossless",
+      "metadata": { },
+      "name": "lossless",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "If set to true, the PNG is exported with a transparent background.",
+      "displayCondition": "type == 'png'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Transparent background",
+      "metadata": { },
+      "name": "transparent_background",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "When true, multi-page designs are merged into a single image.",
+      "displayCondition": "type == 'png'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "As single image",
+      "metadata": { },
+      "name": "as_single_image",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "To specify which pages to export in a multi-page design.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
         "advancedOption": null,
-        "controlType": "SELECT",
+        "controlType": "INTEGER",
         "defaultValue": null,
         "description": null,
         "displayCondition": null,
         "exampleValue": null,
         "expressionEnabled": null,
         "hidden": null,
-        "label": "Type",
-        "languageId": null,
-        "maxLength": null,
+        "label": null,
+        "maxValue": null,
         "metadata": { },
-        "minLength": null,
-        "name": "type",
-        "options": [ {
-          "description": "Export the design as a PDF.",
-          "label": "pdf",
-          "value": "pdf"
-        }, {
-          "description": "Export the design as a JPEG.",
-          "label": "jpg",
-          "value": "jpg"
-        }, {
-          "description": "Export the design as a PNG.",
-          "label": "png",
-          "value": "png"
-        }, {
-          "description": "Export the design as a PPTX.",
-          "label": "pptx",
-          "value": "pptx"
-        }, {
-          "description": "Export the design as a GIF.",
-          "label": "gif",
-          "value": "gif"
-        }, {
-          "description": "Export the design as an MP4.",
-          "label": "mp4",
-          "value": "mp4"
-        }, {
-          "description": "Export the email design as an HTML bundle.",
-          "label": "html_bundle",
-          "value": "html_bundle"
-        }, {
-          "description": "Export the email design as a standalone HTML file with hosted assets.",
-          "label": "html_standalone",
-          "value": "html_standalone"
-        } ],
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": true,
-        "type": "STRING"
-      }, {
-        "advancedOption": null,
-        "controlType": "INTEGER",
-        "defaultValue": null,
-        "description": "The quality of the exported JPEG that determines how compressed the exported file should be.",
-        "displayCondition": "format.type == 'jpg'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Quality",
-        "maxValue": 100,
-        "metadata": { },
-        "minValue": 1,
-        "name": "quality",
+        "minValue": null,
+        "name": null,
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": true,
+        "required": null,
         "type": "INTEGER"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "The orientation and resolution of the exported video.",
-        "displayCondition": "format.type == 'mp4'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Video quality",
-        "languageId": null,
-        "maxLength": null,
-        "metadata": { },
-        "minLength": null,
-        "name": "video_quality",
-        "options": [ {
-          "description": null,
-          "label": "horizontal_480p",
-          "value": "horizontal_480p"
-        }, {
-          "description": null,
-          "label": "horizontal_720p",
-          "value": "horizontal_720p"
-        }, {
-          "description": null,
-          "label": "horizontal_1080p",
-          "value": "horizontal_1080p"
-        }, {
-          "description": null,
-          "label": "horizontal_4k",
-          "value": "horizontal_4k"
-        }, {
-          "description": null,
-          "label": "vertical_480p",
-          "value": "vertical_480p"
-        }, {
-          "description": null,
-          "label": "vertical_720p",
-          "value": "vertical_720p"
-        }, {
-          "description": null,
-          "label": "vertical_1080p",
-          "value": "vertical_1080p"
-        }, {
-          "description": null,
-          "label": "vertical_4k",
-          "value": "vertical_4k"
-        } ],
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": true,
-        "type": "STRING"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "Specifies the export quality of the design.",
-        "displayCondition": "format.type != 'pptx' || format.type != 'html_bundle' || format.type != 'html_standalone'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Export quality",
-        "languageId": null,
-        "maxLength": null,
-        "metadata": { },
-        "minLength": null,
-        "name": "export_quality",
-        "options": [ {
-          "description": null,
-          "label": "Regular",
-          "value": "regular"
-        }, {
-          "description": null,
-          "label": "Pro",
-          "value": "pro"
-        } ],
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": false,
-        "type": "STRING"
-      }, {
-        "advancedOption": null,
-        "controlType": "INTEGER",
-        "defaultValue": null,
-        "description": "Specify the width in pixels of the exported image.",
-        "displayCondition": "format.type == 'jpg' || format.type == 'png' || format.type == 'gif' ",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Width",
-        "maxValue": 25000,
-        "metadata": { },
-        "minValue": 40,
-        "name": "width",
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "required": false,
-        "type": "INTEGER"
-      }, {
-        "advancedOption": null,
-        "controlType": "INTEGER",
-        "defaultValue": null,
-        "description": "Specify the height in pixels of the exported image.",
-        "displayCondition": "format.type == 'jpg' || format.type == 'png' || format.type == 'gif' ",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Height",
-        "maxValue": 25000,
-        "metadata": { },
-        "minValue": 40,
-        "name": "height",
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "required": false,
-        "type": "INTEGER"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "The paper size of the export PDF file.",
-        "displayCondition": "format.type == 'pdf'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Size",
-        "languageId": null,
-        "maxLength": null,
-        "metadata": { },
-        "minLength": null,
-        "name": "size",
-        "options": [ {
-          "description": null,
-          "label": "a4",
-          "value": "a4"
-        }, {
-          "description": null,
-          "label": "a3",
-          "value": "a3"
-        }, {
-          "description": null,
-          "label": "letter",
-          "value": "letter"
-        }, {
-          "description": null,
-          "label": "legal",
-          "value": "legal"
-        } ],
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": false,
-        "type": "STRING"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "If set to true (default), the PNG is exported without compression.",
-        "displayCondition": "format.type == 'png'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Lossless",
-        "metadata": { },
-        "name": "lossless",
-        "options": [ {
-          "description": null,
-          "label": "True",
-          "value": true
-        }, {
-          "description": null,
-          "label": "False",
-          "value": false
-        } ],
-        "placeholder": null,
-        "required": false,
-        "type": "BOOLEAN"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "If set to true, the PNG is exported with a transparent background.",
-        "displayCondition": "format.type == 'png'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Transparent background",
-        "metadata": { },
-        "name": "transparent_background",
-        "options": [ {
-          "description": null,
-          "label": "True",
-          "value": true
-        }, {
-          "description": null,
-          "label": "False",
-          "value": false
-        } ],
-        "placeholder": null,
-        "required": false,
-        "type": "BOOLEAN"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "When true, multi-page designs are merged into a single image.",
-        "displayCondition": "format.type == 'png'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "As single image",
-        "metadata": { },
-        "name": "as_single_image",
-        "options": [ {
-          "description": null,
-          "label": "True",
-          "value": true
-        }, {
-          "description": null,
-          "label": "False",
-          "value": false
-        } ],
-        "placeholder": null,
-        "required": false,
-        "type": "BOOLEAN"
-      }, {
-        "advancedOption": null,
-        "controlType": "ARRAY_BUILDER",
-        "defaultValue": null,
-        "description": "To specify which pages to export in a multi-page design.",
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "items": [ {
-          "advancedOption": null,
-          "controlType": "INTEGER",
-          "defaultValue": null,
-          "description": null,
-          "displayCondition": null,
-          "exampleValue": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "label": null,
-          "maxValue": null,
-          "metadata": { },
-          "minValue": null,
-          "name": null,
-          "options": null,
-          "optionsDataSource": null,
-          "placeholder": null,
-          "required": null,
-          "type": "INTEGER"
-        } ],
-        "label": "Pages",
-        "maxItems": null,
-        "metadata": { },
-        "minItems": null,
-        "multipleValues": null,
-        "name": "pages",
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "required": false,
-        "type": "ARRAY"
       } ],
-      "required": true,
-      "type": "OBJECT"
+      "label": "Pages",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "pages",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "ARRAY"
     } ],
     "resumePerform": null,
     "title": "Export Design",
@@ -3139,9 +3077,9 @@
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "defaultValue": null,
-      "description": "The type of design.",
+      "description": null,
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -3152,139 +3090,97 @@
       "metadata": { },
       "minLength": null,
       "name": "type",
-      "options": null,
+      "options": [ {
+        "description": null,
+        "label": "Preset",
+        "value": "preset"
+      }, {
+        "description": null,
+        "label": "Custom",
+        "value": "custom"
+      } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
-      "placeholder": "type_and_asset",
+      "placeholder": null,
       "regex": null,
       "required": true,
       "type": "STRING"
     }, {
-      "additionalProperties": null,
       "advancedOption": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "SELECT",
       "defaultValue": null,
-      "description": "The desired design type.",
-      "displayCondition": null,
+      "description": "The name of the design type.",
+      "displayCondition": "type == 'preset'",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": null,
+      "label": "Name",
+      "languageId": null,
+      "maxLength": null,
       "metadata": { },
-      "multipleValues": null,
-      "name": "design_type",
+      "minLength": null,
+      "name": "name",
+      "options": [ {
+        "description": null,
+        "label": "Doc",
+        "value": "doc"
+      }, {
+        "description": null,
+        "label": "Email",
+        "value": "email"
+      }, {
+        "description": null,
+        "label": "Presentation",
+        "value": "presentation"
+      }, {
+        "description": null,
+        "label": "Whiteboard",
+        "value": "whiteboard"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "The width of the design, in pixels.",
+      "displayCondition": "type == 'custom'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Width",
+      "maxValue": 8000,
+      "metadata": { },
+      "minValue": 40,
+      "name": "width",
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "properties": [ {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": null,
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Type",
-        "languageId": null,
-        "maxLength": null,
-        "metadata": { },
-        "minLength": null,
-        "name": "type",
-        "options": [ {
-          "description": null,
-          "label": "Preset",
-          "value": "preset"
-        }, {
-          "description": null,
-          "label": "Custom",
-          "value": "custom"
-        } ],
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": true,
-        "type": "STRING"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "The name of the design type.",
-        "displayCondition": "design_type.type == 'preset'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Name",
-        "languageId": null,
-        "maxLength": null,
-        "metadata": { },
-        "minLength": null,
-        "name": "name",
-        "options": [ {
-          "description": null,
-          "label": "Doc",
-          "value": "doc"
-        }, {
-          "description": null,
-          "label": "Email",
-          "value": "email"
-        }, {
-          "description": null,
-          "label": "Presentation",
-          "value": "presentation"
-        }, {
-          "description": null,
-          "label": "Whiteboard",
-          "value": "whiteboard"
-        } ],
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": true,
-        "type": "STRING"
-      }, {
-        "advancedOption": null,
-        "controlType": "INTEGER",
-        "defaultValue": null,
-        "description": "The width of the design, in pixels.",
-        "displayCondition": "design_type.type == 'custom'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Width",
-        "maxValue": 8000,
-        "metadata": { },
-        "minValue": 40,
-        "name": "width",
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "required": true,
-        "type": "INTEGER"
-      }, {
-        "advancedOption": null,
-        "controlType": "INTEGER",
-        "defaultValue": null,
-        "description": "The height of the design, in pixels.",
-        "displayCondition": "design_type.type == 'custom'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Height",
-        "maxValue": 8000,
-        "metadata": { },
-        "minValue": 40,
-        "name": "height",
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "required": true,
-        "type": "INTEGER"
-      } ],
-      "required": false,
-      "type": "OBJECT"
+      "required": true,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "The height of the design, in pixels.",
+      "displayCondition": "type == 'custom'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Height",
+      "maxValue": 8000,
+      "metadata": { },
+      "minValue": 40,
+      "name": "height",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "INTEGER"
     }, {
       "advancedOption": null,
       "controlType": "TEXT",
@@ -3592,370 +3488,350 @@
       "required": true,
       "type": "STRING"
     }, {
-      "additionalProperties": null,
       "advancedOption": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Details about the desired export format.",
+      "description": null,
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Format",
+      "label": "Type",
+      "languageId": null,
+      "maxLength": null,
       "metadata": { },
-      "multipleValues": null,
-      "name": "format",
+      "minLength": null,
+      "name": "type",
+      "options": [ {
+        "description": "Export the design as a PDF.",
+        "label": "pdf",
+        "value": "pdf"
+      }, {
+        "description": "Export the design as a JPEG.",
+        "label": "jpg",
+        "value": "jpg"
+      }, {
+        "description": "Export the design as a PNG.",
+        "label": "png",
+        "value": "png"
+      }, {
+        "description": "Export the design as a PPTX.",
+        "label": "pptx",
+        "value": "pptx"
+      }, {
+        "description": "Export the design as a GIF.",
+        "label": "gif",
+        "value": "gif"
+      }, {
+        "description": "Export the design as an MP4.",
+        "label": "mp4",
+        "value": "mp4"
+      }, {
+        "description": "Export the email design as an HTML bundle.",
+        "label": "html_bundle",
+        "value": "html_bundle"
+      }, {
+        "description": "Export the email design as a standalone HTML file with hosted assets.",
+        "label": "html_standalone",
+        "value": "html_standalone"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "The quality of the exported JPEG that determines how compressed the exported file should be.",
+      "displayCondition": "type == 'jpg'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Quality",
+      "maxValue": 100,
+      "metadata": { },
+      "minValue": 1,
+      "name": "quality",
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "properties": [ {
+      "required": true,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The orientation and resolution of the exported video.",
+      "displayCondition": "type == 'mp4'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Video quality",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "video_quality",
+      "options": [ {
+        "description": null,
+        "label": "horizontal_480p",
+        "value": "horizontal_480p"
+      }, {
+        "description": null,
+        "label": "horizontal_720p",
+        "value": "horizontal_720p"
+      }, {
+        "description": null,
+        "label": "horizontal_1080p",
+        "value": "horizontal_1080p"
+      }, {
+        "description": null,
+        "label": "horizontal_4k",
+        "value": "horizontal_4k"
+      }, {
+        "description": null,
+        "label": "vertical_480p",
+        "value": "vertical_480p"
+      }, {
+        "description": null,
+        "label": "vertical_720p",
+        "value": "verformat.put(WIDTH, inputParameters.getInteger(WIDTH));tical_720p"
+      }, {
+        "description": null,
+        "label": "vertical_1080p",
+        "value": "vertical_1080p"
+      }, {
+        "description": null,
+        "label": "vertical_4k",
+        "value": "vertical_4k"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Specifies the export quality of the design.",
+      "displayCondition": "format.type != 'pptx' || format.type != 'html_bundle' || format.type != 'html_standalone'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Export quality",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "export_quality",
+      "options": [ {
+        "description": null,
+        "label": "Regular",
+        "value": "regular"
+      }, {
+        "description": null,
+        "label": "Pro",
+        "value": "pro"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "Specify the width in pixels of the exported image.",
+      "displayCondition": "type == 'jpg' || type == 'png' || type == 'gif' ",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Width",
+      "maxValue": 25000,
+      "metadata": { },
+      "minValue": 40,
+      "name": "width",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "Specify the height in pixels of the exported image.",
+      "displayCondition": "type == 'jpg' || type == 'png' || type == 'gif' ",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Height",
+      "maxValue": 25000,
+      "metadata": { },
+      "minValue": 40,
+      "name": "height",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The paper size of the export PDF file.",
+      "displayCondition": "type == 'pdf'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Size",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "size",
+      "options": [ {
+        "description": null,
+        "label": "a4",
+        "value": "a4"
+      }, {
+        "description": null,
+        "label": "a3",
+        "value": "a3"
+      }, {
+        "description": null,
+        "label": "letter",
+        "value": "letter"
+      }, {
+        "description": null,
+        "label": "legal",
+        "value": "legal"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "If set to true (default), the PNG is exported without compression.",
+      "displayCondition": "type == 'png'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Lossless",
+      "metadata": { },
+      "name": "lossless",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "If set to true, the PNG is exported with a transparent background.",
+      "displayCondition": "type == 'png'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Transparent background",
+      "metadata": { },
+      "name": "transparent_background",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "When true, multi-page designs are merged into a single image.",
+      "displayCondition": "type == 'png'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "As single image",
+      "metadata": { },
+      "name": "as_single_image",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "To specify which pages to export in a multi-page design.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
         "advancedOption": null,
-        "controlType": "SELECT",
+        "controlType": "INTEGER",
         "defaultValue": null,
         "description": null,
         "displayCondition": null,
         "exampleValue": null,
         "expressionEnabled": null,
         "hidden": null,
-        "label": "Type",
-        "languageId": null,
-        "maxLength": null,
+        "label": null,
+        "maxValue": null,
         "metadata": { },
-        "minLength": null,
-        "name": "type",
-        "options": [ {
-          "description": "Export the design as a PDF.",
-          "label": "pdf",
-          "value": "pdf"
-        }, {
-          "description": "Export the design as a JPEG.",
-          "label": "jpg",
-          "value": "jpg"
-        }, {
-          "description": "Export the design as a PNG.",
-          "label": "png",
-          "value": "png"
-        }, {
-          "description": "Export the design as a PPTX.",
-          "label": "pptx",
-          "value": "pptx"
-        }, {
-          "description": "Export the design as a GIF.",
-          "label": "gif",
-          "value": "gif"
-        }, {
-          "description": "Export the design as an MP4.",
-          "label": "mp4",
-          "value": "mp4"
-        }, {
-          "description": "Export the email design as an HTML bundle.",
-          "label": "html_bundle",
-          "value": "html_bundle"
-        }, {
-          "description": "Export the email design as a standalone HTML file with hosted assets.",
-          "label": "html_standalone",
-          "value": "html_standalone"
-        } ],
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": true,
-        "type": "STRING"
-      }, {
-        "advancedOption": null,
-        "controlType": "INTEGER",
-        "defaultValue": null,
-        "description": "The quality of the exported JPEG that determines how compressed the exported file should be.",
-        "displayCondition": "format.type == 'jpg'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Quality",
-        "maxValue": 100,
-        "metadata": { },
-        "minValue": 1,
-        "name": "quality",
+        "minValue": null,
+        "name": null,
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": true,
+        "required": null,
         "type": "INTEGER"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "The orientation and resolution of the exported video.",
-        "displayCondition": "format.type == 'mp4'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Video quality",
-        "languageId": null,
-        "maxLength": null,
-        "metadata": { },
-        "minLength": null,
-        "name": "video_quality",
-        "options": [ {
-          "description": null,
-          "label": "horizontal_480p",
-          "value": "horizontal_480p"
-        }, {
-          "description": null,
-          "label": "horizontal_720p",
-          "value": "horizontal_720p"
-        }, {
-          "description": null,
-          "label": "horizontal_1080p",
-          "value": "horizontal_1080p"
-        }, {
-          "description": null,
-          "label": "horizontal_4k",
-          "value": "horizontal_4k"
-        }, {
-          "description": null,
-          "label": "vertical_480p",
-          "value": "vertical_480p"
-        }, {
-          "description": null,
-          "label": "vertical_720p",
-          "value": "vertical_720p"
-        }, {
-          "description": null,
-          "label": "vertical_1080p",
-          "value": "vertical_1080p"
-        }, {
-          "description": null,
-          "label": "vertical_4k",
-          "value": "vertical_4k"
-        } ],
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": true,
-        "type": "STRING"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "Specifies the export quality of the design.",
-        "displayCondition": "format.type != 'pptx' || format.type != 'html_bundle' || format.type != 'html_standalone'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Export quality",
-        "languageId": null,
-        "maxLength": null,
-        "metadata": { },
-        "minLength": null,
-        "name": "export_quality",
-        "options": [ {
-          "description": null,
-          "label": "Regular",
-          "value": "regular"
-        }, {
-          "description": null,
-          "label": "Pro",
-          "value": "pro"
-        } ],
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": false,
-        "type": "STRING"
-      }, {
-        "advancedOption": null,
-        "controlType": "INTEGER",
-        "defaultValue": null,
-        "description": "Specify the width in pixels of the exported image.",
-        "displayCondition": "format.type == 'jpg' || format.type == 'png' || format.type == 'gif' ",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Width",
-        "maxValue": 25000,
-        "metadata": { },
-        "minValue": 40,
-        "name": "width",
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "required": false,
-        "type": "INTEGER"
-      }, {
-        "advancedOption": null,
-        "controlType": "INTEGER",
-        "defaultValue": null,
-        "description": "Specify the height in pixels of the exported image.",
-        "displayCondition": "format.type == 'jpg' || format.type == 'png' || format.type == 'gif' ",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Height",
-        "maxValue": 25000,
-        "metadata": { },
-        "minValue": 40,
-        "name": "height",
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "required": false,
-        "type": "INTEGER"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "The paper size of the export PDF file.",
-        "displayCondition": "format.type == 'pdf'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Size",
-        "languageId": null,
-        "maxLength": null,
-        "metadata": { },
-        "minLength": null,
-        "name": "size",
-        "options": [ {
-          "description": null,
-          "label": "a4",
-          "value": "a4"
-        }, {
-          "description": null,
-          "label": "a3",
-          "value": "a3"
-        }, {
-          "description": null,
-          "label": "letter",
-          "value": "letter"
-        }, {
-          "description": null,
-          "label": "legal",
-          "value": "legal"
-        } ],
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": false,
-        "type": "STRING"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "If set to true (default), the PNG is exported without compression.",
-        "displayCondition": "format.type == 'png'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Lossless",
-        "metadata": { },
-        "name": "lossless",
-        "options": [ {
-          "description": null,
-          "label": "True",
-          "value": true
-        }, {
-          "description": null,
-          "label": "False",
-          "value": false
-        } ],
-        "placeholder": null,
-        "required": false,
-        "type": "BOOLEAN"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "If set to true, the PNG is exported with a transparent background.",
-        "displayCondition": "format.type == 'png'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Transparent background",
-        "metadata": { },
-        "name": "transparent_background",
-        "options": [ {
-          "description": null,
-          "label": "True",
-          "value": true
-        }, {
-          "description": null,
-          "label": "False",
-          "value": false
-        } ],
-        "placeholder": null,
-        "required": false,
-        "type": "BOOLEAN"
-      }, {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": "When true, multi-page designs are merged into a single image.",
-        "displayCondition": "format.type == 'png'",
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "As single image",
-        "metadata": { },
-        "name": "as_single_image",
-        "options": [ {
-          "description": null,
-          "label": "True",
-          "value": true
-        }, {
-          "description": null,
-          "label": "False",
-          "value": false
-        } ],
-        "placeholder": null,
-        "required": false,
-        "type": "BOOLEAN"
-      }, {
-        "advancedOption": null,
-        "controlType": "ARRAY_BUILDER",
-        "defaultValue": null,
-        "description": "To specify which pages to export in a multi-page design.",
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "items": [ {
-          "advancedOption": null,
-          "controlType": "INTEGER",
-          "defaultValue": null,
-          "description": null,
-          "displayCondition": null,
-          "exampleValue": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "label": null,
-          "maxValue": null,
-          "metadata": { },
-          "minValue": null,
-          "name": null,
-          "options": null,
-          "optionsDataSource": null,
-          "placeholder": null,
-          "required": null,
-          "type": "INTEGER"
-        } ],
-        "label": "Pages",
-        "maxItems": null,
-        "metadata": { },
-        "minItems": null,
-        "multipleValues": null,
-        "name": "pages",
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "required": false,
-        "type": "ARRAY"
       } ],
-      "required": true,
-      "type": "OBJECT"
+      "label": "Pages",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "pages",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "ARRAY"
     } ],
     "title": "Export Design",
     "type": {
