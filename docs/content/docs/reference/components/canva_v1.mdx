@@ -74,8 +74,10 @@ Name: createDesign
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| type | Type | STRING | The type of design. | true |
-| design_type | null | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(name), INTEGER\(width), INTEGER\(height)&#125; </details> | The desired design type. | false |
+| type | Type | STRING <details> <summary> Options </summary> <span>preset</span>, <span>custom</span> </details> |  | true |
+| name | Name | STRING <details> <summary> Options </summary> <span>doc</span>, <span>email</span>, <span>presentation</span>, <span>whiteboard</span> </details> | The name of the design type. | true |
+| width | Width | INTEGER | The width of the design, in pixels. | true |
+| height | Height | INTEGER | The height of the design, in pixels. | true |
 | title | Title | STRING | The name of the design. | false |
 | asset_id | Asset Id | STRING | The ID of an asset to insert into the created design. | false |
 
@@ -86,12 +88,9 @@ Name: createDesign
   "name" : "createDesign",
   "parameters" : {
     "type" : "",
-    "design_type" : {
-      "type" : "",
-      "name" : "",
-      "width" : 1,
-      "height" : 1
-    },
+    "name" : "",
+    "width" : 1,
+    "height" : 1,
     "title" : "",
     "asset_id" : ""
   },
@@ -159,7 +158,17 @@ Name: exportDesign
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | design_id | Design ID | STRING | The design ID. | true |
-| format | Format | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), INTEGER\(quality), STRING\(video_quality), STRING\(export_quality), INTEGER\(width), INTEGER\(height), STRING\(size), BOOLEAN\(lossless), BOOLEAN\(transparent_background), BOOLEAN\(as_single_image), [INTEGER]\(pages)&#125; </details> | Details about the desired export format. | true |
+| type | Type | STRING <details> <summary> Options </summary> <span title="Export the design as a PDF.">pdf</span>, <span title="Export the design as a JPEG.">jpg</span>, <span title="Export the design as a PNG.">png</span>, <span title="Export the design as a PPTX.">pptx</span>, <span title="Export the design as a GIF.">gif</span>, <span title="Export the design as an MP4.">mp4</span>, <span title="Export the email design as an HTML bundle.">html_bundle</span>, <span title="Export the email design as a standalone HTML file with hosted assets.">html_standalone</span> </details> |  | true |
+| quality | Quality | INTEGER | The quality of the exported JPEG that determines how compressed the exported file should be. | true |
+| video_quality | Video quality | STRING <details> <summary> Options </summary> <span>horizontal_480p</span>, <span>horizontal_720p</span>, <span>horizontal_1080p</span>, <span>horizontal_4k</span>, <span>vertical_480p</span>, <span>verformat.put(WIDTH, inputParameters.getInteger(WIDTH));tical_720p</span>, <span>vertical_1080p</span>, <span>vertical_4k</span> </details> | The orientation and resolution of the exported video. | true |
+| export_quality | Export quality | STRING <details> <summary> Options </summary> <span>regular</span>, <span>pro</span> </details> | Specifies the export quality of the design. | false |
+| width | Width | INTEGER | Specify the width in pixels of the exported image. | false |
+| height | Height | INTEGER | Specify the height in pixels of the exported image. | false |
+| size | Size | STRING <details> <summary> Options </summary> <span>a4</span>, <span>a3</span>, <span>letter</span>, <span>legal</span> </details> | The paper size of the export PDF file. | false |
+| lossless | Lossless | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If set to true (default), the PNG is exported without compression. | false |
+| transparent_background | Transparent background | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If set to true, the PNG is exported with a transparent background. | false |
+| as_single_image | As single image | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When true, multi-page designs are merged into a single image. | false |
+| pages | Pages | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | To specify which pages to export in a multi-page design. | false |
 
 #### Example JSON Structure
 ```json
@@ -168,19 +177,17 @@ Name: exportDesign
   "name" : "exportDesign",
   "parameters" : {
     "design_id" : "",
-    "format" : {
-      "type" : "",
-      "quality" : 1,
-      "video_quality" : "",
-      "export_quality" : "",
-      "width" : 1,
-      "height" : 1,
-      "size" : "",
-      "lossless" : false,
-      "transparent_background" : false,
-      "as_single_image" : false,
-      "pages" : [ 1 ]
-    }
+    "type" : "",
+    "quality" : 1,
+    "video_quality" : "",
+    "export_quality" : "",
+    "width" : 1,
+    "height" : 1,
+    "size" : "",
+    "lossless" : false,
+    "transparent_background" : false,
+    "as_single_image" : false,
+    "pages" : [ 1 ]
   },
   "type" : "canva/v1/exportDesign"
 }
