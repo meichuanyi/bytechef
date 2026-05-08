@@ -149,7 +149,7 @@ public abstract class AbstractAiAgentChatAction {
         return chatClient.prompt(converter.getFormat());
     }
 
-    private List<Advisor> getAdvisors(
+    List<Advisor> getAdvisors(
         ClusterElementMap clusterElementMap, Map<String, ComponentConnection> connectionParameters,
         ActionContext context) {
 
